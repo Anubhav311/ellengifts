@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import {
   ref,
   uploadBytes,
+  uploadBytesResumable,
   getDownloadURL,
   listAll,
   list,
@@ -23,11 +24,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 export default function Home() {
   const [imageUpload, setImageUpload] = useState(null);
   const [imageUrls, setImageUrls] = useState([]);
   const [imageFile, setImageFile] = useState<File>();
+  const [downloadURL, setDownloadURL] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [progressUpload, setProgressUpload] = useState(0);
   const { toast } = useToast();
 
   const handleSelectedFile = (file: FileList) => {
@@ -43,6 +48,44 @@ export default function Home() {
 
   const handleUploadFile = () => {
     if (imageFile) {
+      const name = imageFile.name;
+      const storageRef = ref(storage, `images/${name}g`);
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+          setProgressUpload(progress);
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          toast({
+            title: "Error",
+            description: error.message,
+          });
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+            setDownloadURL(downloadURL);
+          });
+        }
+      );
     } else {
       toast({
         title: "File not uploaded",
@@ -87,13 +130,25 @@ export default function Home() {
             <CardDescription>Card Description</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Card Content</p>
+            {downloadURL && (
+              <>
+                <Image
+                  src={downloadURL}
+                  alt={downloadURL}
+                  style={{ width: 200, height: 200, objectFit: "cover" }}
+                  width={500}
+                  height={500}
+                />
+                <p>{downloadURL}</p>
+              </>
+            )}
           </CardContent>
           <CardFooter className="justify-between">
             <Button variant="outline">Remove</Button>
             <Button onClick={handleUploadFile}>Upload</Button>
           </CardFooter>
         </Card>
+        <Progress value={progressUpload} />
         {/* <Button onClick={uploadFile}> Upload Image</Button> */}
         {imageUrls.map((url) => {
           return <Image src={url} alt="image" key={url} />;
