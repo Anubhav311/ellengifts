@@ -125,21 +125,22 @@ export default function Home() {
           onChange={(files) => handleSelectedFile(files.target.files)}
         />
         <Card className="mt-5">
-          <CardHeader>
+          {/* <CardHeader>
             <CardTitle>Card Title</CardTitle>
             <CardDescription>Card Description</CardDescription>
-          </CardHeader>
+          </CardHeader> */}
           <CardContent>
             {downloadURL && (
               <>
                 <Image
+                  className="m-auto"
                   src={downloadURL}
                   alt={downloadURL}
                   style={{ width: 200, height: 200, objectFit: "cover" }}
                   width={500}
                   height={500}
                 />
-                <p>{downloadURL}</p>
+                {/* <p>{downloadURL}</p> */}
               </>
             )}
           </CardContent>
@@ -147,8 +148,8 @@ export default function Home() {
             <Button variant="outline">Remove</Button>
             <Button onClick={handleUploadFile}>Upload</Button>
           </CardFooter>
+          <Progress value={progressUpload} />
         </Card>
-        <Progress value={progressUpload} />
         {/* <Button onClick={uploadFile}> Upload Image</Button> */}
         {imageUrls.map((url) => {
           return <Image src={url} alt="image" key={url} />;
