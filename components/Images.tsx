@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-  getDownloadURL,
-  listAll,
-  list,
-} from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "@/firebase";
 import { v4 } from "uuid";
 
@@ -16,8 +9,8 @@ export interface IImagesListProps {}
 export function ImagesList(props: IImagesListProps) {
   const [imageUpload, setImageUpload] = useState(null);
   const [imageUrls, setImageUrls] = useState([]);
-
   const imagesListRef = ref(storage, "images/");
+
   const uploadFile = () => {
     if (imageUpload == null) return;
     const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
@@ -38,7 +31,6 @@ export function ImagesList(props: IImagesListProps) {
       });
     });
   }, []);
-  console.log(process.env.NEXT_PUBLIC_STORAGE_BUCKET);
 
   return (
     <div className="App">
@@ -51,7 +43,6 @@ export function ImagesList(props: IImagesListProps) {
       <button onClick={uploadFile}> Upload Image</button>
       {imageUrls.map((url) => {
         return (
-          // <div key={url}>{url}</div>
           <Image alt="image" src={url} key={url} width={500} height={500} />
         );
       })}

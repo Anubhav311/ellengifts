@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/components/ui/use-toast";
 import { Upload } from "@/components/Upload";
 import { ImagesList } from "@/components/Images";
 

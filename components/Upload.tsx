@@ -1,25 +1,11 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-  getDownloadURL,
-  listAll,
-  list,
-} from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebase";
 
 export interface IUploadProps {}
@@ -51,13 +37,11 @@ export function Upload(props: IUploadProps) {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
           setProgressUpload(progress);
-          console.log("Upload is " + progress + "% done");
+
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -74,8 +58,6 @@ export function Upload(props: IUploadProps) {
           });
         },
         () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log("File available at", downloadURL);
             setDownloadURL(downloadURL);
@@ -99,10 +81,6 @@ export function Upload(props: IUploadProps) {
         onChange={(files) => handleSelectedFile(files.target.files)}
       />
       <Card className="mt-5">
-        {/* <CardHeader>
-      <CardTitle>Card Title</CardTitle>
-      <CardDescription>Card Description</CardDescription>
-    </CardHeader> */}
         <CardContent>
           {downloadURL && (
             <>
@@ -114,7 +92,6 @@ export function Upload(props: IUploadProps) {
                 width={500}
                 height={500}
               />
-              {/* <p>{downloadURL}</p> */}
             </>
           )}
         </CardContent>
@@ -124,10 +101,6 @@ export function Upload(props: IUploadProps) {
         </CardFooter>
         <Progress value={progressUpload} />
       </Card>
-      {/* <Button onClick={uploadFile}> Upload Image</Button> */}
-      {/* {imageUrls.map((url) => {
-    return <Image src={url} alt="image" key={url} />;
-  })} */}
     </div>
   );
 }
