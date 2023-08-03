@@ -94,26 +94,27 @@ export default function Home() {
     }
   };
 
-  // const imagesListRef = ref(storage, "images/");
-  // const uploadFile = () => {
-  //   if (imageUpload == null) return;
-  //   const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
-  //   uploadBytes(imageRef, imageUpload).then((snapshot) => {
-  //     getDownloadURL(snapshot.ref).then((url) => {
-  //       setImageUrls((prev) => [...prev, url]);
-  //     });
-  //   });
-  // };
+  const imagesListRef = ref(storage, "images/");
+  const uploadFile = () => {
+    if (imageUpload == null) return;
+    const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+    uploadBytes(imageRef, imageUpload).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        setImageUrls((prev) => [...prev, url]);
+      });
+    });
+  };
 
-  // useEffect(() => {
-  //   listAll(imagesListRef).then((response) => {
-  //     response.items.forEach((item) => {
-  //       getDownloadURL(item).then((url) => {
-  //         setImageUrls((prev) => [...prev, url]);
-  //       });
-  //     });
-  //   });
-  // }, []);
+  useEffect(() => {
+    listAll(imagesListRef).then((response) => {
+      response.items.forEach((item) => {
+        getDownloadURL(item).then((url) => {
+          console.log(url);
+          setImageUrls((prev) => [...prev, url]);
+        });
+      });
+    });
+  }, []);
   console.log(process.env.NEXT_PUBLIC_STORAGE_BUCKET);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -151,8 +152,23 @@ export default function Home() {
           <Progress value={progressUpload} />
         </Card>
         {/* <Button onClick={uploadFile}> Upload Image</Button> */}
-        {imageUrls.map((url) => {
+        {/* {imageUrls.map((url) => {
           return <Image src={url} alt="image" key={url} />;
+        })} */}
+      </div>
+      <div className="App">
+        <input
+          type="file"
+          onChange={(event) => {
+            setImageUpload(event.target.files[0]);
+          }}
+        />
+        <button onClick={uploadFile}> Upload Image</button>
+        {imageUrls.map((url) => {
+          return (
+            // <div key={url}>{url}</div>
+            <Image alt="image" src={url} key={url} width={500} height={500} />
+          );
         })}
       </div>
       <Toaster />
