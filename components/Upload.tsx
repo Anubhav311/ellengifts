@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,12 @@ export function Upload(props: IUploadProps) {
   const [downloadURL, setDownloadURL] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [progressUpload, setProgressUpload] = useState(0);
+  const inputRef = useRef(null);
   const { toast } = useToast();
 
-  const handleSelectedFile = (file: FileList) => {
-    if (file[0].size < 100000000) {
-      setImageFile(file[0]);
+  const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files[0].size < 100000000) {
+      setImageFile(event.target.files[0]);
     } else {
       toast({
         title: "Scheduled: Catch up",
@@ -72,35 +73,57 @@ export function Upload(props: IUploadProps) {
     }
   };
 
+  const handleRemove = () => {
+    inputRef.current.value = null;
+    setImageFile(undefined);
+  };
+
   return (
     <div className="App">
       <Input
         type="file"
         id="picture"
         accept="image/png"
-        onChange={(files) => handleSelectedFile(files.target.files)}
+        onChange={(event) => handleSelectedFile(event)}
+        ref={inputRef}
       />
-      <Card className="mt-5">
-        <CardContent>
-          {downloadURL && (
-            <>
-              <Image
-                className="m-auto"
-                src={downloadURL}
-                alt={downloadURL}
-                style={{ width: 200, height: 200, objectFit: "cover" }}
-                width={500}
-                height={500}
-              />
-            </>
-          )}
-        </CardContent>
-        <CardFooter className="justify-between">
-          <Button variant="outline">Remove</Button>
-          <Button onClick={handleUploadFile}>Upload</Button>
-        </CardFooter>
-        <Progress value={progressUpload} />
-      </Card>
+      {/* {imageFile && (
+        <Image
+          src={URL.createObjectURL(imageFile)}
+          // style={styles.image}
+          alt="Thumb"
+          width={500}
+          height={500}
+        />
+      )} */}
+      {/* <Image src={imageFile} alt="selcted image" /> */}
+      {/* {imageFile && <Button onClick={handleUploadFile}>Upload</Button>} */}
+
+      {imageFile && (
+        <Card className="mt-5">
+          <CardContent>
+            {imageFile && (
+              <>
+                <Image
+                  className="m-auto"
+                  src={URL.createObjectURL(imageFile)}
+                  alt="selected image"
+                  style={{ width: 200, height: 200, objectFit: "cover" }}
+                  width={500}
+                  height={500}
+                />
+              </>
+            )}
+          </CardContent>
+          <CardFooter className="justify-between">
+            <Button variant="outline" onClick={handleRemove}>
+              Remove
+            </Button>
+            <Button onClick={handleUploadFile}>Upload</Button>
+          </CardFooter>
+          <Progress value={progressUpload} />
+        </Card>
+      )}
     </div>
   );
 }
