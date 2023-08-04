@@ -6,18 +6,14 @@ import { ref, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "@/firebase";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { saveAs } from "file-saver";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface IImagesListProps {}
 
 export default function ImagesList(props: IImagesListProps) {
   const [imageUrls, setImageUrls] = useState([]);
   const imagesListRef = ref(storage, "images/");
-
-  const handleDownloa = () => {
-    console.log("downloading");
-  };
 
   useEffect(() => {
     listAll(imagesListRef).then((response) => {
@@ -31,14 +27,13 @@ export default function ImagesList(props: IImagesListProps) {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      {imageUrls.map((url) => {
+      {imageUrls.map((url, id) => {
         return (
-          <Card key={url} className="mt-10">
+          <Card key={id} className="mt-10">
             <CardContent>
               <Image alt="image" src={url} key={url} width={500} height={500} />
             </CardContent>
             <CardFooter className="justify-end">
-              <Button onClick={handleDownloa}>Download</Button>
               <FirebaseImageDownloadButton imagePath={url} />
             </CardFooter>
           </Card>
@@ -86,23 +81,39 @@ interface FirebaseImageDownloadButtonProps {
 const FirebaseImageDownloadButton: React.FC<
   FirebaseImageDownloadButtonProps
 > = ({ imagePath }) => {
+  const { toast } = useToast();
+
   const handleDownload = async () => {
     try {
       const storageRef = ref(storage, imagePath);
       const imageFile = await getDownloadURL(storageRef);
 
       // Fetch the image data
-      const response = await fetch(imageFile);
-      const blob = await response.blob();
+      const imageBlob = await fetch(imageFile)
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => new Blob([buffer], { type: "image/jpeg" }));
+      // const blob = await response.blob();
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(imageBlob);
+      link.download = "downloaded-image";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
       // Extract the image file name from the path (you may need to adjust this based on your path structure)
-      const fileName = imagePath.split("/").pop();
+      // const fileName = imagePath.split("/").pop();
 
-      saveAs(blob, fileName || "downloaded_image.png");
+      // saveAs(blob, fileName || "downloaded_image.png");
     } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Something went wrong. Please try again",
+      });
       console.error("Error while downloading the image:", error);
     }
   };
 
-  return <button onClick={handleDownload}>Download Image</button>;
+  return <Button onClick={handleDownload}>Download Image</Button>;
 };

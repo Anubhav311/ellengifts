@@ -19,7 +19,7 @@ export function Upload(props: IUploadProps) {
   const { toast } = useToast();
 
   const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files[0].size < 1000) {
+    if (event.target.files[0].size < 10000000) {
       setImageFile(event.target.files[0]);
     } else {
       inputRef.current.value = null;
