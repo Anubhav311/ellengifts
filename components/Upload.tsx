@@ -19,12 +19,13 @@ export function Upload(props: IUploadProps) {
   const { toast } = useToast();
 
   const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files[0].size < 100000000) {
+    if (event.target.files[0].size < 1000) {
       setImageFile(event.target.files[0]);
     } else {
+      inputRef.current.value = null;
       toast({
-        title: "Scheduled: Catch up",
-        description: "Friday, February 10, 2023 at 5:57 PM",
+        title: "Image size is too big",
+        description: "The image should be less than 10 MB",
       });
     }
   };
@@ -62,6 +63,10 @@ export function Upload(props: IUploadProps) {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log("File available at", downloadURL);
             setDownloadURL(downloadURL);
+            toast({
+              title: "Image Uploaded Successfully",
+              description: "You can close the window now",
+            });
           });
         }
       );
@@ -87,17 +92,6 @@ export function Upload(props: IUploadProps) {
         onChange={(event) => handleSelectedFile(event)}
         ref={inputRef}
       />
-      {/* {imageFile && (
-        <Image
-          src={URL.createObjectURL(imageFile)}
-          // style={styles.image}
-          alt="Thumb"
-          width={500}
-          height={500}
-        />
-      )} */}
-      {/* <Image src={imageFile} alt="selcted image" /> */}
-      {/* {imageFile && <Button onClick={handleUploadFile}>Upload</Button>} */}
 
       {imageFile && (
         <Card className="mt-5">
@@ -108,7 +102,7 @@ export function Upload(props: IUploadProps) {
                   className="m-auto"
                   src={URL.createObjectURL(imageFile)}
                   alt="selected image"
-                  style={{ width: 200, height: 200, objectFit: "cover" }}
+                  // style={{ width: 200, height: 200, objectFit: "cover" }}
                   width={500}
                   height={500}
                 />
