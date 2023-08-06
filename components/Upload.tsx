@@ -12,9 +12,7 @@ export interface IUploadProps {}
 
 export function Upload(props: IUploadProps) {
   const [imageFile, setImageFile] = useState<File>();
-  const [downloadURL, setDownloadURL] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [progressUpload, setProgressUpload] = useState(0);
   const inputRef = useRef(null);
   const { toast } = useToast();
 
@@ -30,11 +28,40 @@ export function Upload(props: IUploadProps) {
     }
   };
 
+  return (
+    <div className="App">
+      <Input
+        type="file"
+        id="picture"
+        accept="image/png"
+        onChange={(event) => handleSelectedFile(event)}
+        ref={inputRef}
+      />
+      <DisplayFile
+        file={imageFile}
+        fileRef={inputRef}
+        setImageFile={setImageFile}
+      />
+    </div>
+  );
+}
+
+export interface IDisplayFileProps {
+  file: File;
+  fileRef: React.MutableRefObject<any>;
+  setImageFile: React.Dispatch<React.SetStateAction<File>>;
+}
+
+export function DisplayFile(props: IDisplayFileProps) {
+  const [progressUpload, setProgressUpload] = useState(0);
+  const { toast } = useToast();
+  const { file, fileRef, setImageFile } = props;
+
   const handleUploadFile = () => {
-    if (imageFile) {
-      const name = imageFile.name;
+    if (file) {
+      const name = file.name;
       const storageRef = ref(storage, `images/${name}g`);
-      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(
         "state_changed",
@@ -62,7 +89,6 @@ export function Upload(props: IUploadProps) {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log("File available at", downloadURL);
-            setDownloadURL(downloadURL);
             toast({
               title: "Image Uploaded Successfully",
               description: "You can close the window now",
@@ -79,28 +105,20 @@ export function Upload(props: IUploadProps) {
   };
 
   const handleRemove = () => {
-    inputRef.current.value = null;
+    fileRef.current.value = null;
     setImageFile(undefined);
   };
 
   return (
-    <div className="App">
-      <Input
-        type="file"
-        id="picture"
-        accept="image/png"
-        onChange={(event) => handleSelectedFile(event)}
-        ref={inputRef}
-      />
-
-      {imageFile && (
+    <div>
+      {file && (
         <Card className="mt-5">
           <CardContent>
-            {imageFile && (
+            {file && (
               <>
                 <Image
                   className="m-auto"
-                  src={URL.createObjectURL(imageFile)}
+                  src={URL.createObjectURL(file)}
                   alt="selected image"
                   // style={{ width: 200, height: 200, objectFit: "cover" }}
                   width={500}
