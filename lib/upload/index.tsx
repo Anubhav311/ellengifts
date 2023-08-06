@@ -4,14 +4,11 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { useToast } from "@/components/ui/use-toast";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "@/firebase";
 
 export interface IUploadProps {
   maxSizeInMb: number;
   fileTypes?: string;
-  handleUpload: (file) => void;
+  handleUpload: (file: File) => void;
 }
 
 export function Upload({
@@ -20,7 +17,6 @@ export function Upload({
   handleUpload,
 }: IUploadProps) {
   const [imageFile, setImageFile] = useState<File>();
-  const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
 
   return (
@@ -43,7 +39,7 @@ export function Upload({
 
 export interface IInputFieldProps {
   maxSizeInMb: number;
-  setImageFile: React.Dispatch<React.SetStateAction<File>>;
+  setImageFile: React.Dispatch<React.SetStateAction<File | undefined>>;
   inputRef: React.MutableRefObject<any>;
   fileTypes: string;
 }
@@ -56,11 +52,13 @@ export function InputField({
 }: IInputFieldProps) {
   const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
     const maxSizeInBytes = maxSizeInMb * 1000000;
-    if (event.target.files[0].size < maxSizeInBytes) {
-      setImageFile(event.target.files[0]);
-    } else {
-      inputRef.current.value = null;
-      console.log("error received");
+    if (event.target.files !== null) {
+      if (event.target.files[0].size < maxSizeInBytes) {
+        setImageFile(event.target.files[0]);
+      } else {
+        inputRef.current.value = null;
+        console.log("error received");
+      }
     }
   };
 
@@ -79,10 +77,10 @@ export function InputField({
 }
 
 export interface IDisplayFileProps {
-  file: File;
+  file: File | undefined;
   fileRef: React.MutableRefObject<any>;
-  setImageFile: React.Dispatch<React.SetStateAction<File>>;
-  handleUpload: (file) => void;
+  setImageFile: React.Dispatch<React.SetStateAction<File | undefined>>;
+  handleUpload: (file: File) => void;
 }
 
 export function DisplayFile({
@@ -92,7 +90,6 @@ export function DisplayFile({
   handleUpload,
 }: IDisplayFileProps) {
   const [progressUpload, setProgressUpload] = useState(0);
-  const { toast } = useToast();
 
   const handleRemove = () => {
     fileRef.current.value = null;

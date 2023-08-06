@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function Home() {
   const { toast } = useToast();
 
-  const handleUploadFile = (file) => {
+  const handleUploadFile = (file: File) => {
     if (file) {
       const name = file.name;
       const storageRef = ref(storage, `images/${name}g`);
