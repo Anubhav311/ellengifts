@@ -1,6 +1,6 @@
 "use client";
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { initializeApp, getApps, FirebaseApp, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { FirebaseStorage, getStorage } from "firebase/storage";
 // import { getAnalytics } from "firebase/analytics";
@@ -10,13 +10,13 @@ import { FirebaseStorage, getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 type firebaseConfig = {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-  measurementId: string;
+  apiKey: string | undefined;
+  authDomain: string | undefined;
+  projectId: string | undefined;
+  storageBucket: string | undefined;
+  messagingSenderId: string | undefined;
+  appId: string | undefined;
+  measurementId: string | undefined;
 };
 
 const firebaseConfig: firebaseConfig = {
@@ -35,7 +35,7 @@ getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 if (getApps().length === 0) {
   app = initializeApp(firebaseConfig);
 } else {
-  app = getApps[0];
+  app = getApp();
 }
 // const app = initializeApp(firebaseConfig);
 // export const db = getFirestore(app);

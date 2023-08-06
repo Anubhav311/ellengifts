@@ -7,8 +7,8 @@ import { v4 } from "uuid";
 export interface IImagesListProps {}
 
 export function ImagesList(props: IImagesListProps) {
-  const [imageUpload, setImageUpload] = useState(null);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const imagesListRef = ref(storage, "images/");
 
   const uploadFile = () => {
@@ -37,6 +37,8 @@ export function ImagesList(props: IImagesListProps) {
       <input
         type="file"
         onChange={(event) => {
+          if (!event.target.files) return;
+
           setImageUpload(event.target.files[0]);
         }}
       />
