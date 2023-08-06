@@ -1,12 +1,12 @@
 "use client";
 
 import { Toaster } from "@/components/ui/toaster";
-import { Upload } from "@/components/Upload";
+import { Upload } from "@/lib/upload/index";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Upload />
+      <Upload maxSizeInMb={10} />
       <Toaster />
     </main>
   );

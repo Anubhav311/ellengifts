@@ -8,16 +8,20 @@ import { useToast } from "@/components/ui/use-toast";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebase";
 
-export interface IUploadProps {}
+export interface IUploadProps {
+  maxSizeInMb: number;
+}
 
 export function Upload(props: IUploadProps) {
   const [imageFile, setImageFile] = useState<File>();
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
   const { toast } = useToast();
+  const { maxSizeInMb } = props;
 
   const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files[0].size < 10000000) {
+    const maxSizeInBytes = maxSizeInMb * 1000000;
+    if (event.target.files[0].size < maxSizeInBytes) {
       setImageFile(event.target.files[0]);
     } else {
       inputRef.current.value = null;
