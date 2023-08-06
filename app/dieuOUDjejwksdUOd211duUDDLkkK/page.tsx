@@ -6,13 +6,12 @@ import { ref, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "@/firebase";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { saveAs } from "file-saver";
 import { useToast } from "@/components/ui/use-toast";
 
 export interface IImagesListProps {}
 
 export default function ImagesList(props: IImagesListProps) {
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const imagesListRef = ref(storage, "images/");
 
   useEffect(() => {
