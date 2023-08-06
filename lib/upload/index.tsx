@@ -10,41 +10,66 @@ import { storage } from "@/firebase";
 
 export interface IUploadProps {
   maxSizeInMb: number;
+  fileTypes?: string;
 }
 
-export function Upload(props: IUploadProps) {
+export function Upload({
+  maxSizeInMb,
+  fileTypes = "image/png,image/jpeg,image/jpg",
+}: IUploadProps) {
   const [imageFile, setImageFile] = useState<File>();
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
   const { toast } = useToast();
-  const { maxSizeInMb } = props;
 
+  return (
+    <div className="App">
+      <InputField
+        maxSizeInMb={maxSizeInMb}
+        setImageFile={setImageFile}
+        inputRef={inputRef}
+        fileTypes={fileTypes}
+      />
+      <DisplayFile
+        file={imageFile}
+        fileRef={inputRef}
+        setImageFile={setImageFile}
+      />
+    </div>
+  );
+}
+
+export interface IInputFieldProps {
+  maxSizeInMb: number;
+  setImageFile: React.Dispatch<React.SetStateAction<File>>;
+  inputRef: React.MutableRefObject<any>;
+  fileTypes: string;
+}
+
+export function InputField({
+  maxSizeInMb,
+  setImageFile,
+  inputRef,
+  fileTypes,
+}: IInputFieldProps) {
   const handleSelectedFile = (event: ChangeEvent<HTMLInputElement>) => {
     const maxSizeInBytes = maxSizeInMb * 1000000;
     if (event.target.files[0].size < maxSizeInBytes) {
       setImageFile(event.target.files[0]);
     } else {
       inputRef.current.value = null;
-      toast({
-        title: "Image size is too big",
-        description: "The image should be less than 10 MB",
-      });
+      console.log("error received");
     }
   };
-
   return (
-    <div className="App">
+    <div>
       <Input
+        className="w-100"
         type="file"
         id="picture"
-        accept="image/png"
+        accept={fileTypes}
         onChange={(event) => handleSelectedFile(event)}
         ref={inputRef}
-      />
-      <DisplayFile
-        file={imageFile}
-        fileRef={inputRef}
-        setImageFile={setImageFile}
       />
     </div>
   );
