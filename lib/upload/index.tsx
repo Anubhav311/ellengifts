@@ -11,16 +11,17 @@ import { storage } from "@/firebase";
 export interface IUploadProps {
   maxSizeInMb: number;
   fileTypes?: string;
+  handleUpload: (file) => void;
 }
 
 export function Upload({
   maxSizeInMb,
   fileTypes = "image/png,image/jpeg,image/jpg",
+  handleUpload,
 }: IUploadProps) {
   const [imageFile, setImageFile] = useState<File>();
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
-  const { toast } = useToast();
 
   return (
     <div className="App">
@@ -34,6 +35,7 @@ export function Upload({
         file={imageFile}
         fileRef={inputRef}
         setImageFile={setImageFile}
+        handleUpload={handleUpload}
       />
     </div>
   );
@@ -61,6 +63,7 @@ export function InputField({
       console.log("error received");
     }
   };
+
   return (
     <div>
       <Input
@@ -79,59 +82,17 @@ export interface IDisplayFileProps {
   file: File;
   fileRef: React.MutableRefObject<any>;
   setImageFile: React.Dispatch<React.SetStateAction<File>>;
+  handleUpload: (file) => void;
 }
 
-export function DisplayFile(props: IDisplayFileProps) {
+export function DisplayFile({
+  file,
+  fileRef,
+  setImageFile,
+  handleUpload,
+}: IDisplayFileProps) {
   const [progressUpload, setProgressUpload] = useState(0);
   const { toast } = useToast();
-  const { file, fileRef, setImageFile } = props;
-
-  const handleUploadFile = () => {
-    if (file) {
-      const name = file.name;
-      const storageRef = ref(storage, `images/${name}g`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-
-          setProgressUpload(progress);
-
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          toast({
-            title: "Error",
-            description: error.message,
-          });
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            console.log("File available at", downloadURL);
-            toast({
-              title: "Image Uploaded Successfully",
-              description: "You can close the window now",
-            });
-          });
-        }
-      );
-    } else {
-      toast({
-        title: "File not uploaded",
-        description: "something went wrong while uploading the ifle",
-      });
-    }
-  };
 
   const handleRemove = () => {
     fileRef.current.value = null;
@@ -160,7 +121,7 @@ export function DisplayFile(props: IDisplayFileProps) {
             <Button variant="outline" onClick={handleRemove}>
               Remove
             </Button>
-            <Button onClick={handleUploadFile}>Upload</Button>
+            <Button onClick={() => handleUpload(file)}>Upload</Button>
           </CardFooter>
           <Progress value={progressUpload} />
         </Card>
