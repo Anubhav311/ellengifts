@@ -102,16 +102,31 @@ export function DisplayFile({
         <Card className="mt-5">
           <CardContent>
             {file && (
-              <>
-                <Image
-                  className="m-auto"
-                  src={URL.createObjectURL(file)}
-                  alt="selected image"
-                  // style={{ width: 200, height: 200, objectFit: "cover" }}
-                  width={500}
-                  height={500}
-                />
-              </>
+              <div>
+                <>
+                  <div
+                    style={{
+                      backgroundImage: `url("https://firebasestorage.googleapis.com/v0/b/ellengifts.appspot.com/o/assets%2Fwall%20(1).jpg?alt=media&token=bc9507ea-6a44-430e-8ce7-dc6beeec9749")`,
+                      height: "80vh",
+                      width: "100%",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      className="m-auto"
+                      src={URL.createObjectURL(file)}
+                      alt="selected image"
+                      // style={{ width: 200, height: 200, objectFit: "cover" }}
+                      width={500}
+                      height={500}
+                    />
+                  </div>
+                </>
+              </div>
             )}
           </CardContent>
           <CardFooter className="justify-between">

@@ -60,7 +60,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Upload
         maxSizeInMb={10}
-        fileTypes="image/png"
+        fileTypes="image/png,image/jpg"
         handleUpload={handleUploadFile}
       />
       <Toaster />
